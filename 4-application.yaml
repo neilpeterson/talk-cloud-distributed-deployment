@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: osba-storage-demo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: osba-storage-demo
+    spec:
+      containers:
+      - name: osba-storage-demo
+        image: neilpeterson/osba-storage-demo
+        ports:
+        - containerPort: 80
+        env:
+        - name: AZURE_STORAGE_ACCT
+          valueFrom:
+            secretKeyRef:
+              key: storageAccountName
+              name: osba-azure-storag-demo
+        - name: AZURE_KEY
+          valueFrom:
+            secretKeyRef:
+              key: accessKey
+              name: osba-azure-storag-demo
+        - name: CONTAINER
+          valueFrom:
+            secretKeyRef:
+              key: containerName
+              name: osba-azure-storag-demo

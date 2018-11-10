@@ -1,0 +1,11 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: azure-storage-demo
+  namespace: default
+spec:
+  clusterServiceClassExternalName: azure-storage
+  clusterServicePlanExternalName: blob-container
+  parameters:
+    location: eastus
+    resourceGroup: osba-azure-storag-demo
