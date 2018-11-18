@@ -1,6 +1,6 @@
 End to End:
 
-	helm install azure-samples/twitter-sentiment -f values.yaml --set filterText=Warsaw
+	helm install azure-samples/twitter-sentiment -f values.yaml --set filterText=Cake
 
 Infrastructure:
 
@@ -20,9 +20,9 @@ List classes / plans:
 
 Storage Demo:
 
-	k create -f  2-instance.yaml
-	k create -f  3-binding.yaml
-	k create -f  4-application.yaml
+	kubectl create -f 2-instance.yaml
+	kubectl create -f 3-binding.yaml
+	kubectl create -f 4-application.yaml
 
 End to End:
 
