@@ -4,8 +4,8 @@ metadata:
   name: azure-storage-demo
   namespace: default
 spec:
-  clusterServiceClassExternalName: azure-storage
-  clusterServicePlanExternalName: blob-container
+  clusterServiceClassExternalName: azure-storage-blob-storage-account-and-container
+  clusterServicePlanExternalName: all-in-one
   parameters:
     location: eastus
     resourceGroup: osba-azure-storag-demo
