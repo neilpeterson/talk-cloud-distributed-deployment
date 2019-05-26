@@ -28,6 +28,6 @@ duffle bundle list
 
 duffle install --credentials=azure --set twitter-text=cake --set database=nepeters-cosmos-db --set database-rg=nepeters-cosmos-db --set aks-cluster=nepeters-aks --set aks-cluster-rg=nepeters-aks duffle-cake twitter-sentiment:0.1.0
 
-duffle install --credentials=azure --set twitter-text=cake --set aks-cluster=nepeters-aks --set aks-cluster-rg=nepeters-aks duffle-cake twitter-sentiment:0.1.0
+duffle install --credentials=azure --set twitter-text=cake --set aks-cluster=nepeters-aks-svcat --set aks-cluster-rg=nepeters-aks-svcat duffle-cake-three twitter-sentiment:0.1.0
 
 duffle uninstall --credentials=azure duffle-cake-five

@@ -31,11 +31,12 @@ case $CNAB_ACTION in
         echo "Create cognitive services account: $AZURE_ANALYTICS"
         az cognitiveservices account create --name $AZURE_ANALYTICS -g $CNAB_INSTALLATION_NAME --kind TextAnalytics --sku S0 --location $AZURE_RESOURCE_GROUP_LOCATION --yes
 
-        if [ ! -z "$(az cosmosdb list --query "[?contains(name, '$AZURE_COSMOS_DB')]" -o tsv)" ]; then
+        if [ ! -z "$(az cosmosdb list --query "[?name=='$AZURE_COSMOS_DB']" -o tsv)" ]; then
             echo "Cosmos DB found, skipping creation."
         else
             echo "Create Comsmos DB: $AZURE_COSMOS_DB"
             az cosmosdb create --name $AZURE_COSMOS_DB --resource-group $CNAB_INSTALLATION_NAME
+            AZURE_COSMOS_RG=$CNAB_INSTALLATION_NAME
         fi
 
         # Get endpoints and keys
