@@ -1,14 +1,10 @@
-# Talk initial setup
+# Demo 1 - Terraform
 export ARM_ACCESS_KEY=$(az keyvault secret show --name armAccessKeyTerraform --vault-name nepeterskv007 --query value -o tsv)
-terraform init
-terraform workspace new demo-001
-terraform init
-terraform apply
-terraform workspace new demo-002
-terraform init
-terraform apply
+terraform workspace list
+terraform workspace select demo-001
+terraform destroy
 
-# Demo 1 - Service Catalog
+# Demo 2 - Service Catalog
 ## Infrastructure
 kubectl get pods --all-namespaces
 kubectl get apiservice
@@ -31,11 +27,6 @@ kubectl create -f svcat/3-application.yaml
 helm repo add azure-samples https://azure-samples.github.io/helm-charts/
 helm install azure-samples/osba-storage-demo
 helm install azure-samples/osba-storage-demo
-
-# Demo 2 - Terraform
-terraform workspace list
-terraform workspace select demo-001
-terraform destroy
 
 # Demo 3 -  CNAB
 cd cnab
