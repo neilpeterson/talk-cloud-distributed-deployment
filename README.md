@@ -1,4 +1,6 @@
 # Talk initial setup
+export ARM_ACCESS_KEY=$(az keyvault secret show --name armAccessKeyTerraform --vault-name nepeterskv007 --query value -o tsv)
+terraform init
 terraform workspace new demo-001
 terraform init
 terraform apply
@@ -31,7 +33,6 @@ helm install azure-samples/osba-storage-demo
 helm install azure-samples/osba-storage-demo
 
 # Demo 2 - Terraform
-export ARM_ACCESS_KEY=$(az keyvault secret show --name armAccessKeyTerraform --vault-name nepeterskv007 --query value -o tsv)
 terraform workspace list
 terraform workspace select demo-001
 terraform destroy
