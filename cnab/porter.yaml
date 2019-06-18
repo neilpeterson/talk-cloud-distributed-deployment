@@ -1,0 +1,206 @@
+name: twitter-sentiment
+version: 0.1.0
+description: "Twitter Sentiment Application"
+invocationImage: neilpeterson/twitter-sentiment-porter
+dockerfile: Dockerfile.tmpl
+
+mixins:
+  - exec
+  - terraform
+  - helm
+
+credentials:
+  - name: subscriptionid
+    env: AZURE_SUBSCRIPTION_ID
+  - name: azuretenantid
+    env: AZURE_TENANT_ID
+  - name: azureclientid
+    env: AZURE_CLIENT_ID
+  - name: azureclientsecret
+    env: AZURE_CLIENT_SECRET
+  - name: twitterConsumerKey
+    env: TWITTER_CONSUMER_KEY
+  - name: twitterConsumerSecret
+    env: TWITTER_CONSUMER_SECRET
+  - name: twitterAccessToken
+    env: TWITTER_ACCESS_TOKEN
+  - name: twitterAccessTokenSecret
+    env: TWITTER_ACCESS_SECRET
+
+parameters:
+
+  - name: resource-prefix
+    type: string
+    default: "porter-twitter"
+  - name: search-text
+    type: string
+    default: "pizza"
+
+install:
+
+  - exec:
+      description: "Azure CLI login"
+      command: "az"
+      arguments:
+        - "login"
+        - "--service-principal"
+        - "--username"
+        - "{{ bundle.credentials.azureclientid}}"
+        - "--password"
+        - "{{ bundle.credentials.azureclientsecret}}"
+        - "--tenant"
+        - "{{ bundle.credentials.azuretenantid}}"
+
+  - terraform:
+      description: "Install Queue and Text Analytics"
+      autoApprove: true
+      input: false
+      vars:
+        resource_group: "{{ bundle.parameters.resource-prefix }}"
+        client_id: "{{ bundle.credentials.azureclientid }}"
+        client_secret: "{{ bundle.credentials.azureclientsecret }}"
+        tenant_id: "{{ bundle.credentials.azuretenantid }}"
+        subscription_id: "{{ bundle.credentials.subscriptionid }}"
+      outputs:
+        - name: "ANALYTICS-FQDN"
+          key: "ANALYTICS-FQDN"
+        - name: "ANALYTICS-KEY"
+          key: "ANALYTICS-KEY"
+        - name: "AZURE_STORAGE_ACCT"
+          key: "AZURE_STORAGE_ACCT"
+        - name: "AZURE_QUEUE_KEY"
+          key: "AZURE_QUEUE_KEY"
+        - name: "AZURE_COSMOS_HOST"
+          key: "AZURE_COSMOS_HOST"
+        - name: "AZURE_COSMOS_KEY"
+          key: "AZURE_COSMOS_KEY"
+
+  - exec:
+      description: "Get AKS Credentials"
+      command: "az"
+      arguments:
+        - "aks"
+        - "get-credentials"
+        - "--name"
+        - "aks-svcat-cluster"
+        - "--resource-group"
+        - "aks-svcat-cluster"
+
+  - exec:
+      description: "Create AKS Secrets"
+      command: "kubectl"
+      arguments:
+        - "create"
+        - "namespace"
+        - "{{ bundle.parameters.resource-prefix }}"
+
+  - exec:
+      description: "Create text analytics AKS secrets"
+      command: "kubectl"
+      arguments:
+        - "create"
+        - "secret"
+        - "generic"
+        - "{{ bundle.parameters.resource-prefix }}-tweet-sentiment-analytics"
+        - "--from-literal=textAnalyticsEndpoint={{ bundle.outputs.ANALYTICS-FQDN }}"
+        - "--from-literal=textAnalyticsKey={{ bundle.outputs.ANALYTICS-KEY }}"
+        - "--namespace={{ bundle.parameters.resource-prefix }}"
+
+  - exec:
+      description: "Create storage queue AKS secrets"
+      command: "kubectl"
+      arguments:
+        - "create"
+        - "secret"
+        - "generic"
+        - "{{ bundle.parameters.resource-prefix }}-tweet-sentiment-storage"
+        - "--from-literal=storageAccountName={{ bundle.outputs.AZURE_STORAGE_ACCT }}"
+        - "--from-literal=accessKey={{ bundle.outputs.AZURE_QUEUE_KEY }}"
+        - "--namespace={{ bundle.parameters.resource-prefix }}"
+
+  - exec:
+      description: "Create Cosmos DB AKS secrets"
+      command: "kubectl"
+      arguments:
+        - "create"
+        - "secret"
+        - "generic"
+        - "{{ bundle.parameters.resource-prefix }}-tweet-sentiment-cosmos"
+        - "--from-literal=uri={{ bundle.outputs.AZURE_COSMOS_HOST }}"
+        - "--from-literal=primaryKey={{ bundle.outputs.AZURE_COSMOS_KEY }}"
+        - "--namespace={{ bundle.parameters.resource-prefix }}"
+
+  - exec:
+      description: "Add Helm Repository"
+      command: "helm"
+      arguments:
+        - "repo"
+        - "add"
+        - "azure-samples"
+        - "https://azure-samples.github.io/helm-charts/"
+
+  - helm:
+      description: "Helm Install Twitter Sentiment Pods"
+      name: "{{ bundle.parameters.resource-prefix }}"
+      chart: azure-samples/twitter-sentiment-cnab
+      namespace: "{{ bundle.parameters.resource-prefix }}"
+      replace: true
+      set:
+        consumerKey: "{{ bundle.credentials.twitterConsumerKey }}"
+        consumerSecret: "{{ bundle.credentials.twitterConsumerSecret }}"
+        accessToken: "{{ bundle.credentials.twitterAccessToken }}"
+        accessTokenSecret: "{{ bundle.credentials.twitterAccessTokenSecret }}"
+        filterText: "{{ bundle.parameters.search-text }}"
+
+uninstall:
+
+  - exec:
+      description: "Azure CLI login"
+      command: "az"
+      arguments:
+        - "login"
+        - "--service-principal"
+        - "--username"
+        - "{{ bundle.credentials.azureclientid}}"
+        - "--password"
+        - "{{ bundle.credentials.azureclientsecret}}"
+        - "--tenant"
+        - "{{ bundle.credentials.azuretenantid}}"
+
+  - exec:
+      description: "Get AKS Credentials"
+      command: "az"
+      arguments:
+        - "aks"
+        - "get-credentials"
+        - "--name"
+        - "aks-svcat-cluster"
+        - "--resource-group"
+        - "aks-svcat-cluster"
+
+  - exec:
+      description: "Delete Resource Group"
+      command: "az"
+      arguments:
+        - "group"
+        - "delete"
+        - "--name"
+        - "{{ bundle.parameters.resource-prefix }}"
+        - "--yes"
+        - "--no-wait"
+
+  - exec:
+      description: "Delete Helm release"
+      command: "helm"
+      arguments:
+        - "delete"
+        - "{{ bundle.parameters.resource-prefix }}"
+        - "--purge"
+
+  - exec:
+      description: "Delete Kubernetes namespace"
+      command: "kubectl"
+      arguments:
+        - "delete"
+        - "namespace"
+        - "{{ bundle.parameters.resource-prefix }}"

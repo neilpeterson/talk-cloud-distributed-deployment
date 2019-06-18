@@ -9,6 +9,7 @@ terraform destroy
 kubectl get pods --all-namespaces
 kubectl get apiservice
 kubectl get clusterservicebroker
+kubectl describe clusterservicebroker osba
 
 ## Classes and Plans
 kubectl get clusterserviceclasses
@@ -30,13 +31,8 @@ helm install azure-samples/osba-storage-demo
 
 # Demo 3 -  CNAB
 cd cnab
-duffle bundle list
-duffle build .
-duffle bundle list
-
-duffle install --credentials=azure --set twitter-text=cake --set database=nepeters-cosmos-db --set database-rg=nepeters-cosmos-db --set aks-cluster=nepeters-aks-svcat --set aks-cluster-rg=nepeters-aks-svcat duffle-cake twitter-sentiment:0.1.0
-
-duffle install --credentials=azure --set twitter-text=pizza --set database=nepeters-cosmos-db --set database-rg=nepeters-cosmos-db --set aks-cluster=nepeters-aks-svcat --set aks-cluster-rg=nepeters-aks-svcat duffle-pizza twitter-sentiment:0.1.0
-
-duffle uninstall --credentials=azure duffle-cake
-duffle uninstall --credentials=azure duffle-pizza
+export PATH=$PATH:~/.porter
+porter build
+porter install --param resource-prefix=porter-twitter-demo --param search-text=pizza --cred twitter-sentiment
+porter bundle list
+porter uninstall twitter-sentiment --cred twitter-sentiment
