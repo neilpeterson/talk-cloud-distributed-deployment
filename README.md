@@ -30,8 +30,6 @@ helm install azure-samples/osba-storage-demo
 helm install azure-samples/osba-storage-demo
 
 # Demo 3 -  CNAB
-cd cnab
-export PATH=$PATH:~/.porter
 porter build
 porter install --param resource-prefix=porter-twitter-demo --param search-text=pizza --cred twitter-sentiment
 porter bundle list
