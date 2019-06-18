@@ -8,6 +8,7 @@ mixins:
   - exec
   - terraform
   - helm
+  - kubernetes
 
 credentials:
   - name: subscriptionid
