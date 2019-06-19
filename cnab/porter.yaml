@@ -88,7 +88,7 @@ install:
         - "aks-svcat-cluster"
 
   - exec:
-      description: "Create AKS Secrets"
+      description: "Create AKS Namespace"
       command: "kubectl"
       arguments:
         - "create"
