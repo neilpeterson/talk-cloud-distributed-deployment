@@ -29,7 +29,6 @@ credentials:
     env: TWITTER_ACCESS_SECRET
 
 parameters:
-
   - name: resource-prefix
     type: string
     default: "porter-twitter"
@@ -38,7 +37,6 @@ parameters:
     default: "pizza"
 
 install:
-
   - exec:
       description: "Azure CLI login"
       command: "az"
@@ -154,7 +152,6 @@ install:
         filterText: "{{ bundle.parameters.search-text }}"
 
 uninstall:
-
   - exec:
       description: "Azure CLI login"
       command: "az"
