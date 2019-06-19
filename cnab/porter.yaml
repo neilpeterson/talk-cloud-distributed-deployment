@@ -75,7 +75,7 @@ install:
           key: "AZURE_COSMOS_KEY"
 
   - exec:
-      description: "Get AKS Credentials"
+      description: "Get Kubernetes Credentials"
       command: "az"
       arguments:
         - "aks"
@@ -86,7 +86,7 @@ install:
         - "aks-svcat-cluster"
 
   - exec:
-      description: "Create AKS Namespace"
+      description: "Create Kubernetes Namespace"
       command: "kubectl"
       arguments:
         - "create"
@@ -94,7 +94,7 @@ install:
         - "{{ bundle.parameters.resource-prefix }}"
 
   - exec:
-      description: "Create text analytics AKS secrets"
+      description: "Create text analytics Kubernetes secrets"
       command: "kubectl"
       arguments:
         - "create"
@@ -106,7 +106,7 @@ install:
         - "--namespace={{ bundle.parameters.resource-prefix }}"
 
   - exec:
-      description: "Create storage queue AKS secrets"
+      description: "Create storage queue Kubernetes secrets"
       command: "kubectl"
       arguments:
         - "create"
@@ -118,7 +118,7 @@ install:
         - "--namespace={{ bundle.parameters.resource-prefix }}"
 
   - exec:
-      description: "Create Cosmos DB AKS secrets"
+      description: "Create Cosmos DB Kubernetes secrets"
       command: "kubectl"
       arguments:
         - "create"

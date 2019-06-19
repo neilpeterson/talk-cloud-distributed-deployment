@@ -31,6 +31,6 @@ helm install azure-samples/osba-storage-demo
 
 # Demo 3 -  CNAB
 porter build
-porter install --param resource-prefix=porter-twitter-demo-two --param search-text=cake --cred twitter-sentiment
+porter install --param resource-prefix=porter-twitter-demo --param search-text=cake --cred twitter-sentiment
 porter bundle list
 porter uninstall twitter-sentiment --cred twitter-sentiment
